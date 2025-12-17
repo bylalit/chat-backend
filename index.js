@@ -12,10 +12,12 @@ const { Server } = require('socket.io');
 
 
 
-mongoose.connect('mongodb://127.0.0.1:27017/chat-app')
+mongoose.connect('mongodb+srv://lalitkp0101_db_user:4fbmvi6HtKTnGWnC@cluster0.xv0bryn.mongodb.net/chat-app')
   .then(() => console.log('Connected To Database'))
   .catch(err => console.log(err));
 
+  // mongodb+srv://lalitkp0101_db_user:4fbmvi6HtKTnGWnC@cluster0.xv0bryn.mongodb.net/
+  // mongodb+srv://lalitkp0101_db_user:4fbmvi6HtKTnGWnC@cluster0.xv0bryn.mongodb.net/
 
 app.use(cors());  // REST API CORS
 app.use(express.urlencoded({ extended: true }));
