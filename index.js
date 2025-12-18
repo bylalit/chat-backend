@@ -33,7 +33,6 @@ app.use(
   })
 );
 
-app.options('*', cors());
 
 // Body parsers
 app.use(express.urlencoded({ extended: true }));
