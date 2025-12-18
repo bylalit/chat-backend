@@ -1,86 +1,86 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const compression = require("compression");
+
+const { createServer } = require("node:http");
+const { Server } = require("socket.io");
+
+const messageRoutes = require("./routes/message.routes");
+const userRouter = require("./routes/user.routes");
+const Message = require("./models/Messages.model");
+
 const app = express();
-const mongoose = require('mongoose');
-const messageRoutes = require('./routes/message.routes');
-const userRouter = require('./routes/user.routes');
-const Message = require('./models/Messages.model');
-const minifyHTML = require('express-minify-html-terser');
-const compression = require('compression')
 
-const { createServer } = require('node:http');
-const { Server } = require('socket.io');
+mongoose
+  .connect(
+    process.env.MONGO_URI ||
+      "mongodb+srv://lalitkp0101_db_user:4fbmvi6HtKTnGWnC@cluster0.xv0bryn.mongodb.net/chat-app"
+  )
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Error:", err));
 
+//  MIDDLEWARES (CORRECT ORDER)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:4200",
+      "https://chat-fronted-g3fi2i5ws-bylalits-projects.vercel.app",
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 
-
-mongoose.connect('mongodb+srv://lalitkp0101_db_user:4fbmvi6HtKTnGWnC@cluster0.xv0bryn.mongodb.net/chat-app')
-  .then(() => console.log('Connected To Database'))
-  .catch(err => console.log(err));
-
-  // mongodb+srv://lalitkp0101_db_user:4fbmvi6HtKTnGWnC@cluster0.xv0bryn.mongodb.net/
-  // mongodb+srv://lalitkp0101_db_user:4fbmvi6HtKTnGWnC@cluster0.xv0bryn.mongodb.net/
-
-app.use(cors());  // REST API CORS
+// Body parsers
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "4mb" }));
 
 app.use(compression());
 
-app.use(minifyHTML({
-    override:      true,
-    htmlMinifier: {
-        removeComments:            true,
-        collapseWhitespace:        true,
-        collapseBooleanAttributes: true,
-        removeAttributeQuotes:     true,
-        removeEmptyAttributes:     true,
-        minifyJS:                  true
-    }
-}));
+app.use("/api/auth", userRouter);
+app.use("/api/messages", messageRoutes);
 
-app.use('/api/auth', userRouter);
-app.use('/api/messages', messageRoutes);
-
-// ====== Create HTTP + Socket.IO server ======
 const server = createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: "https://chat-fronted-g3fi2i5ws-bylalits-projects.vercel.app",
-    methods: ["GET", "POST"]
-  }
+    origin: [
+      "http://localhost:4200",
+      "https://chat-fronted-g3fi2i5ws-bylalits-projects.vercel.app",
+    ],
+    methods: ["GET", "POST"],
+  },
 });
 
-// ====== Socket.IO Events ======
-io.on('connection', (socket) => {
-  console.log('A User Connected: ' + socket.id);
+io.on("connection", (socket) => {
+  console.log("User Connected:", socket.id);
 
-  // Listen for incoming messages from client
-  socket.on('sendMessage', async (msg) => {
+  socket.on("sendMessage", async (msg) => {
     try {
       const newMessage = new Message({
         senderId: msg.senderId,
         receiverId: msg.receiverId,
-        message: msg.message
+        message: msg.message,
       });
 
       await newMessage.save();
 
-      // Emit to all connected clients
-      io.emit('receiveMessage', newMessage);
-
+      // Send message to all users
+      io.emit("receiveMessage", newMessage);
     } catch (error) {
-      console.error('Error saving message:', error);
+      console.error("Message Save Error:", error);
     }
   });
 
-  // Optional: disconnect
-  socket.on('disconnect', () => {
-    console.log('User disconnected: ' + socket.id);
+  socket.on("disconnect", () => {
+    console.log("User Disconnected:", socket.id);
   });
 });
 
-// ====== Start Server ======
-server.listen(3000, () => {
-  console.log('Server running on port 3000');
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
