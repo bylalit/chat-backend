@@ -29,7 +29,6 @@ app.use(
       "https://chat-fronted-g3fi2i5ws-bylalits-projects.vercel.app",
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 );
