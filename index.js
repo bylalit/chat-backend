@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const messageRoutes = require('./routes/message.routes');
 const userRouter = require('./routes/user.routes');
 const Message = require('./models/Messages.model');
+const minifyHTML = require('express-minify-html-terser');
+const compression = require('compression')
 
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
@@ -23,6 +25,19 @@ app.use(cors());  // REST API CORS
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "4mb" }));
 
+app.use(compression());
+
+app.use(minifyHTML({
+    override:      true,
+    htmlMinifier: {
+        removeComments:            true,
+        collapseWhitespace:        true,
+        collapseBooleanAttributes: true,
+        removeAttributeQuotes:     true,
+        removeEmptyAttributes:     true,
+        minifyJS:                  true
+    }
+}));
 
 app.use('/api/auth', userRouter);
 app.use('/api/messages', messageRoutes);
