@@ -31,7 +31,7 @@ app.use('/api/messages', messageRoutes);
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "chat-fronted-git-main-bylalits-projects.vercel.app",
+    origin: "https://chat-fronted-g3fi2i5ws-bylalits-projects.vercel.app",
     methods: ["GET", "POST"]
   }
 });
