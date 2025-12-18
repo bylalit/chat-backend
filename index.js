@@ -49,7 +49,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:4200",
-      "https://chat-fronted-g3fi2i5ws-bylalits-projects.vercel.app",
+      "https://chat-fronted-n0w2bc7s9-bylalits-projects.vercel.app",
     ],
     methods: ["GET", "POST"],
   },
