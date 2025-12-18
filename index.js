@@ -28,10 +28,13 @@ app.use(
       "http://localhost:4200",
       "https://chat-fronted-g3fi2i5ws-bylalits-projects.vercel.app",
     ],
-    methods: ["GET", "POST"],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 );
+
+app.options('*', cors());
 
 // Body parsers
 app.use(express.urlencoded({ extended: true }));
