@@ -55,6 +55,7 @@ const io = new Server(server, {
   },
 });
 
+
 io.on("connection", (socket) => {
   console.log("User Connected:", socket.id);
 
@@ -65,7 +66,6 @@ io.on("connection", (socket) => {
         receiverId: msg.receiverId,
         message: msg.message,
       });
-
       await newMessage.save();
 
       // Send message to all users
@@ -80,8 +80,8 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
 
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
